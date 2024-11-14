@@ -6,7 +6,7 @@ This module can be used to update your upstream-list without reloadding Nginx.
 
 ## Example
 
-file: conf/nginx.conf
+file: `conf/nginx.conf`
 
 `ATTENTION`: You MUST use nginx variable to do proxy_pass
 
@@ -114,61 +114,49 @@ git clone git@github.com:openresty/lua-nginx-module.git
 
 ### dyups_interface
 
-Syntax: **dyups_interface**
-
-Default: `none`
-
-Context: `loc`
+- Syntax: **dyups_interface**
+- Default: `none`
+- Context: `loc`
 
 This directive set the interface location where you can add or delete the upstream list. See the section of Interface for detail.
 
 ### dyups_read_msg_timeout
 
-Syntax: **dyups_read_msg_timeout** `time`
-
-Default: `1s`
-
-Context: `main`
+- Syntax: **dyups_read_msg_timeout** `time`
+- Default: `1s`
+- Context: `main`
 
 This directive set the interval of workers readding the commands from share memory.
 
 ### dyups_shm_zone_size
 
-Syntax: **dyups_shm_zone_size** `size`
-
-Default: `2MB`
-
-Context: `main`
+- Syntax: **dyups_shm_zone_size** `size`
+- Default: `2MB`
+- Context: `main`
 
 This directive set the size of share memory which used to store the commands.
 
 ### dyups_upstream_conf
 
-Syntax: **dyups_upstream_conf** `path`
-
-Default: `none`
-
-Context: `main`
+- Syntax: **dyups_upstream_conf** `path`
+- Default: `none`
+- Context: `main`
 
 This directive has been deprecated.
 
 ### dyups_trylock
 
-Syntax: **dyups_trylock** `on | off`
-
-Default: `off`
-
-Context: `main`
+- Syntax: **dyups_trylock** `on | off`
+- Default: `off`
+- Context: `main`
 
 You will get a better prefomance but it maybe not stable, and you will get a '409' when the update request conflicts with others.
 
 ### dyups_read_msg_log
 
-Syntax: **dyups_read_msg_log** `on | off`
-
-Default: `off`
-
-Context: `main`
+- Syntax: **dyups_read_msg_log** `on | off`
+- Default: `off`
+- Context: `main`
 
 You can enable / disable log of workers readding the commands from share memory. The log looks like:
 
@@ -206,6 +194,7 @@ Other code means you should modify your commands and call the interface again.
 
 ```bash
 curl -H "host: dyhost" 127.0.0.1:8080
+```
 
 > <html>
 > <head><title>502 Bad Gateway</title></head>
@@ -215,19 +204,27 @@ curl -H "host: dyhost" 127.0.0.1:8080
 > </body>
 > </html>
 
+```bash
 curl -d "server 127.0.0.1:8089;server 127.0.0.1:8088;" 127.0.0.1:8081/upstream/dyhost
+```
 
 > success
 
+```bash
 curl -H "host: dyhost" 127.0.0.1:8080
+```
 
 > 8089
 
+```bash
 curl -H "host: dyhost" 127.0.0.1:8080
+```
 
 > 8088
 
+```bash
 curl 127.0.0.1:8081/detail
+```
 
 > host1
 > server 127.0.0.1:8088 weight=1 max_conns=0 max_fails=1 fail_timeout=10 backup=0 down=0
@@ -239,18 +236,21 @@ curl 127.0.0.1:8081/detail
 > server 127.0.0.1:8089 weight=1 max_conns=0 max_fails=1 fail_timeout=10 backup=0 down=0
 > server 127.0.0.1:8088 weight=1 max_conns=0 max_fails=1 fail_timeout=10 backup=0 down=0
 
+```bash
 curl -i -X DELETE 127.0.0.1:8081/upstream/dyhost
+```
 
 > success
 
+```bash
 curl 127.0.0.1:8081/detail
+```
 
 > host1
 > server 127.0.0.1:8088 weight=1 max_conns=0 max_fails=1 fail_timeout=10 backup=0 down=0
 >
 > host2
 > server 127.0.0.1:8089 weight=1 max_conns=0 max_fails=1 fail_timeout=10 backup=0 down=0
-```
 
 ## C API
 
@@ -291,6 +291,17 @@ content_by_lua '
 ```
 
 ## Change Log
+
+### RELEASE v0.3.0
+
+- Fix: memory leak of ssl session reuse.
+- Each processes starts read_msg_timer separately at random timeout.
+- Fix: unlocking behavior.
+- Fix: compilation error without upstream check module.
+- Fix: if a domain name contains multiple IP addresses, call them.
+- When dyups and health check module together use, ngx_shmtx_lock block too long time and cpu full load, cause health check timeout, 502.
+- Fix: build error when compiled with a higher version of OpenSSL.
+- etc.
 
 ### RELEASE V0.2.9
 
